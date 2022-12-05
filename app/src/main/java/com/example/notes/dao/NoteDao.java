@@ -10,6 +10,7 @@ import com.example.notes.entities.Note;
 
 import java.util.List;
 
+// untuk akses data dari database
 @Dao
 public interface NoteDao {
 

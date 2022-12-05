@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+// adapeter /adaptor menghubungkan data (notes) ke RecyclerView
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder>{
 
     private List<Note> notes;
@@ -40,6 +41,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         notesSource = notes;
     }
 
+//    untuk bikin viewHolder Baru
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,7 +52,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         );
     }
 
-//    ado suppress yang kutambah
+// untuk updadte viewHolder Content ketika di scroll sesuai posisi
+//    ketika Note ditekan, maka tampilkan notes
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.setNote(notes.get(position));
@@ -62,24 +65,31 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         });
     }
 
+//    untuk tau berapa banyak notes
     @Override
     public int getItemCount() {
         return notes.size();
     }
 
+//    mengetahui possisi notes
     @Override
     public int getItemViewType(int position) {
         return position;
     }
 
+
+//    view holder extends kelas ViewHolder. Ini berisi informasi tampilan untuk menampilkan satu
+//    item dari layout item
     static class NoteViewHolder extends RecyclerView.ViewHolder {
 
         TextView textTitle, textSubtitle, textDateTime;
         LinearLayout layoutNote;
         RoundedImageView imageNote;
 
+//        Konstruktor
         NoteViewHolder(@NonNull View itemView) {
             super(itemView);
+//            define notes yang akan ditampilakn
             textTitle = itemView.findViewById(R.id.textTitle);
             textSubtitle = itemView.findViewById(R.id.textSubtitle);
             textDateTime = itemView.findViewById(R.id.textDateTime);
@@ -87,28 +97,40 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             imageNote = itemView.findViewById(R.id.imageNote);
         }
 
-//        untuk menampilkan data tiap note
+//        untuk data yang ditampilkan
         void setNote(Note note) {
+//            title
             textTitle.setText(note.getTitle());
+//            subtitle
             if(note.getSubtitle().trim().isEmpty()) {
+//                jika kosong / tidak ada maka visibility di hilangkan
                 textSubtitle.setVisibility(View.GONE);
             } else {
                 textSubtitle.setText(note.getSubtitle());
             }
+//            textDateTime (waktu)
             textDateTime.setText(note.getDateTime());
+//            ini untuk background notes (warna notes)
             GradientDrawable gradientDrawable = (GradientDrawable) layoutNote.getBackground();
+//            jika color note bukan null, dalam artian, user menyetting warna notes
+//            maka set color notes menjadi color tersebut
             if(note.getColor() != null) {
                 gradientDrawable.setColor(Color.parseColor(note.getColor()));
             }
             else {
+//               jika user tidak menyeting color notes, maka set default
                 gradientDrawable.setColor(Color.parseColor("#333333"));
             }
 
+//            untuk gambar
+//            jika notes memiliki image, yang dibuktikan bahwa imagepath tidak null
             if(note.getImagePath() != null) {
+//                maka tampilkan image tersebut
                 imageNote.setImageBitmap(BitmapFactory.decodeFile(note.getImagePath()));
                 imageNote.setVisibility(View.VISIBLE);
             }
             else {
+//                jika tidak maka jangan ditampilkan imageNote
                 imageNote.setVisibility(View.GONE);
             }
 

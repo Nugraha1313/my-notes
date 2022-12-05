@@ -58,8 +58,6 @@ public class CreateNoteActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_SELECT_IMAGE = 2;
 
     private AlertDialog dialogAddURL, dialogDeleteNote;
-
-
     private Note alreadyAvailableNote;
 
     @Override
@@ -67,9 +65,10 @@ public class CreateNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_note);
 
-//        ketika tekan button back maka balik lagi ke main activity
+//        mendefinisikan gambar icon imageback, kedalam variabel, yang dicari by id
         ImageView imageBack = findViewById(R.id.imageBack);
 
+//        ketika ditekan maka balik ke main activity
         imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,6 +76,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             }
         });
 
+//        define berdasarkan id
         inputNoteTitle = findViewById(R.id.inputNoteTitle);
         inputNoteSubtitle = findViewById(R.id.inputNoteSubtitle);
         inputNoteText = findViewById(R.id.inputNote);
@@ -87,11 +87,12 @@ public class CreateNoteActivity extends AppCompatActivity {
         layoutWebURL = findViewById(R.id.layoutWebURL);
 
 
+//        tampilkan text date time waktu sekarang, dengan format berikut
         textDateTime.setText(
                 new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm a", Locale.getDefault()).format(new Date())
         );
 
-//        ketika tekan button save, maka lakukan saveNote()
+//        ketika tekan button save , maka lakukan saveNote()
         ImageView imageSave = findViewById(R.id.imageSave);
         imageSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,30 +105,42 @@ public class CreateNoteActivity extends AppCompatActivity {
         selectedNoteColor = "#333333";
         selectedImagePath = "";
 
+//       jika bukan view atau update.... ?????
         if(getIntent().getBooleanExtra("isViewOrUpdate", false)) {
             alreadyAvailableNote = (Note) getIntent().getSerializableExtra("note");
             setViewOrUpdateNote();
         }
 
+//        ketika tekan imageRemoveWebURL
         findViewById(R.id.imageRemoveWebURL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                ketika diklik maka set text webURL jadi null (kosongkan)
+//                lalu setting visibilitas layoutweburl jadi gone(tidak terlihat)
                 textWebURL.setText(null);
                 layoutWebURL.setVisibility(View.GONE);
             }
         });
 
+//        ketika tekan imageRemoveImage
         findViewById(R.id.imageRemoveImage).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                imageNote adalah imageView, imageView kita dapat jadikan gambar dengan setImageBItmap
+//                imageBitmap / gambar kita kosongkan
                 imageNote.setImageBitmap(null);
+//                lalu imageNote kita set layout imageNote
                 imageNote.setVisibility(View.GONE);
+//                lalu icon imageRemoveImage kita hilangkan visibilitanya
                 findViewById(R.id.imageRemoveImage).setVisibility(View.GONE);
+//                lalu imagePath Sekarang kosongkan
                 selectedImagePath = "";
             }
         });
 
+//        inisialisasi miscellaneous / settings -> ubah color note, add image, add add web url, delete note
         initMiscellaneous();
+//        ini warna note
         setSubtitleIndicatorColor();
     }
 
@@ -162,6 +175,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             return;
         }
 
+//        prepare untuk save note
         final Note note = new Note();
         note.setTitle(inputNoteTitle.getText().toString());
         note.setSubtitle(inputNoteSubtitle.getText().toString());
@@ -180,6 +194,8 @@ public class CreateNoteActivity extends AppCompatActivity {
             note.setWebLink(textWebURL.getText().toString());
         }
 
+//        ROOM database tidak bisa menjalankan operasi database pada Main Thread
+//        Jadi harus dilakukan secara asyncrhonous->tidak nunggu perintah lain selesai
 //        task save note dilakukan secara asynchronous
         @SuppressLint("StaticFieldLeak")
         class SaveNoteTask extends AsyncTask<Void, Void, Void> {
@@ -195,6 +211,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 Intent intent = new Intent();
+//                untuk ngasih Result Kalau insert berhasil, dengan kode result_ok
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -204,20 +221,28 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     }
 
+//    inisialisasi miscellaneous /settings
     private void initMiscellaneous() {
         final LinearLayout layoutMiscellaneous = findViewById(R.id.layoutMiscellaneous);
         final BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(layoutMiscellaneous);
+
+//        ketika layoutmiscellaneous ditekan lakukan perintah
         layoutMiscellaneous.findViewById(R.id.layoutMiscellaneous).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                jika belum ditekan
                 if (bottomSheetBehavior.getState() != bottomSheetBehavior.STATE_EXPANDED) {
+//                    maka expand
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                } else {
+                }
+//                namun jika sudah ditekan, dan ditekan lagi, maka collapsed, atau minimize kan
+                else {
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
         });
 
+//        define imageView color dari miscellanous
         final ImageView imageColor1 = layoutMiscellaneous.findViewById(R.id.imageColor1);
         final ImageView imageColor2 = layoutMiscellaneous.findViewById(R.id.imageColor2);
         final ImageView imageColor3 = layoutMiscellaneous.findViewById(R.id.imageColor3);
@@ -290,9 +315,12 @@ public class CreateNoteActivity extends AppCompatActivity {
             }
         });
 
+//        tampilan subtitle note indicator, perkondisian centang jika dipilih
+//        alreadyAvailableNote != null ->jika bukan note baru
         if(alreadyAvailableNote != null && alreadyAvailableNote.getColor() != null && !alreadyAvailableNote.getColor().trim().isEmpty()) {
             switch (alreadyAvailableNote.getColor()) {
                 case "#FDBE3B":
+//                    perform click bearti onClick
                     layoutMiscellaneous.findViewById(R.id.viewColor2).performClick();
                     break;
                 case "#FF4842":
@@ -347,7 +375,9 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     }
 
+//    dialog konfirmasi hapus notes
     private void showDeleteNoteDialog() {
+//        jika dialog nya belum ada / belum ditekan
         if(dialogDeleteNote == null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(CreateNoteActivity.this);
             View view = LayoutInflater.from(this).inflate(
@@ -360,6 +390,7 @@ public class CreateNoteActivity extends AppCompatActivity {
                 dialogDeleteNote.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             }
 
+//            jika user tekan delete
             view.findViewById(R.id.textDeleteNote).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -428,6 +459,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         }
     }
 
+//    perkondisian ketika select image, lalu tampilkan langsung ke notes sekarang
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -438,10 +470,12 @@ public class CreateNoteActivity extends AppCompatActivity {
                     try {
                         InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+//                        tampilkan image yang diselect
                         imageNote.setImageBitmap(bitmap);
                         imageNote.setVisibility(View.VISIBLE);
+//                        tampilkan icon remove image
                         findViewById(R.id.imageRemoveImage).setVisibility(View.VISIBLE);
-
+//                        lalu set imagePath
                         selectedImagePath = getPathFromUri(selectedImageUri);
 
                     } catch (Exception exception) {
@@ -482,6 +516,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             final EditText inputURL = view.findViewById(R.id.inputURL);
             inputURL.requestFocus();
 
+//            ketika add url ditekan
             view.findViewById(R.id.textAdd).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -490,13 +525,17 @@ public class CreateNoteActivity extends AppCompatActivity {
                     } else if(!Patterns.WEB_URL.matcher(inputURL.getText().toString()).matches()) {
                         Toast.makeText(CreateNoteActivity.this, "Enter Valid URL", Toast.LENGTH_SHORT).show();
                     } else {
+//                        jika valid
                         textWebURL.setText(inputURL.getText().toString());
+//                        tampilkan layout webURL
                         layoutWebURL.setVisibility(view.VISIBLE);
+//                        lalu close dialognya
                         dialogAddURL.dismiss();
                     }
                 }
             });
 
+//            kalo cancel
             view.findViewById(R.id.textCancel).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

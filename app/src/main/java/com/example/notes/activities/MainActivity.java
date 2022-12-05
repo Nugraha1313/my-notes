@@ -28,6 +28,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NotesListener {
 
+//    request code nantinya akan digunakan ngepass value, sehingga bisa digunakan sbg perkondisian
     public static final int REQUEST_CODE_ADD_NOTE = 1,
                             REQUEST_CODE_UPDATE_NOTE = 2,
                             REQUEST_CODE_SHOW_NOTES = 3;
@@ -54,13 +55,18 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
             }
         });
 
+//      untuk tampilan daftar list notes
         notesRecyclerView = findViewById(R.id.notesRecyclerView);
         notesRecyclerView.setLayoutManager(
+//                buatlah tampilan dengan 2 kolom, secara vertikal
                 new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         );
 
+//        note List adalah kumpulan notes
         noteList = new ArrayList<>();
+//        noteadapter akan memakai data dari notelist
         notesAdapter = new NotesAdapter(noteList, this);
+//        recyclerView membutuhkan adapter untuk menampilkan data notes ke RecyclerView
         notesRecyclerView.setAdapter(notesAdapter);
 
 //        ini untuk display notes di main activity
@@ -89,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
 
     }
 
+//    ketika note diclick / maka tampilkan
     @Override
     public void onNoteClicked(Note note, int position) {
         noteClickedPosition = position;
@@ -99,11 +106,13 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
 
     }
 
+//    dapetin notes
     private void getNotes(final int requestCode, final boolean isNoteDeleted) {
 
         @SuppressLint("StaticFieldLeak")
         class GetNotesTask extends AsyncTask<Void, Void, List<Note>> {
 
+//            dibackground lakukan get data note dari database
             @Override
             protected List<Note> doInBackground(Void... voids) {
                 return NotesDatabase.getDatabase(getApplicationContext()).noteDao().getAllNotes();
@@ -125,10 +134,12 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
 //                }
 //                notesRecyclerView.smoothScrollToPosition(0);
 
+//                perkondisian get Notes
                 if(requestCode == REQUEST_CODE_SHOW_NOTES) {
                     noteList.addAll(notes);
                     notesAdapter.notifyDataSetChanged();
                 } else if(requestCode == REQUEST_CODE_ADD_NOTE) {
+//                    maka hanya tambahkan noteList ke posisi awal / paling atas / terbaru
                     noteList.add(0, notes.get(0));
                     notesAdapter.notifyItemInserted(0);
                     notesRecyclerView.smoothScrollToPosition(0);
@@ -153,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
     }
 
 
+// Ngehandle result untuk update noteList setelah ditambahkan note baru dari CreateNoteActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -163,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         }
 //        karna ini update note yang sudah ada, maka ada kemungkinan note didelete
         else if(requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == RESULT_OK) {
+//            kalo data tidak null bearti update
             if(data != null) {
                 getNotes(REQUEST_CODE_UPDATE_NOTE, data.getBooleanExtra("isNoteDeleted", false));
             }
